@@ -25,18 +25,69 @@ Display the event types that are available
 - Else, find earliest time
  */
 
-func main() {
-	// Event spans from monday - tuesday
-	st, _ := time.Parse(time.RFC3339, "2018-05-05T15:02:20+00:00")
-	ed, _ := time.Parse(time.RFC3339, "2018-06-05T15:02:20+00:00")
+func testTime() {
+	sr1 := simplecalendar.TimeBlockAllDays(1300, 1330, simplecalendar.Busy)
+	sr2 := simplecalendar.TimeBlockAllDays(0, 600, simplecalendar.Busy)
 
-	isAvail := simplecalendar.DefaultBusinessWeek.IsAvailable(EventTimes{
+	s := simplecalendar.TimeSchedule{
+		Times: []simplecalendar.TimeBlockSchedule{
+			sr1,
+			sr2,
+		},
+	}
+	simplecalendar.Conf.SetTimes(s)
+	st22, _ := time.Parse(time.RFC3339, "2018-05-05T13:02:20+00:00")
+	et22, _ := time.Parse(time.RFC3339, "2018-05-05T13:15:20+00:00")
+	ee := simplecalendar.EventTimes {
+		Start: st22,
+		End: et22,
+	}
+
+	log.Println("Lunch is "+sr1.IsAvailable(ee).String())
+	log.Println("Lunch is "+sr2.IsAvailable(ee).String())
+}
+
+func testDate() {
+	// saturday
+	st, _ := time.Parse(time.RFC3339, "2018-05-05T15:02:20+00:00")
+	// sunday
+	ed, _ := time.Parse(time.RFC3339, "2018-05-06T15:02:20+00:00")
+
+	isAvail := simplecalendar.DefaultBusinessWeek.IsAvailable(simplecalendar.EventTimes{
 		Start: st,
 		End: ed,
 	})
-	log.Printf("Is available: %b\n", isAvail)
+	if isAvail == simplecalendar.Available {
+		log.Println("Is available!")
+	} else {
+		log.Println("Is NOT available!")
+	}
+
+	// saturday
+	st1, _ := time.Parse(time.RFC3339, "2018-05-02T15:02:20+00:00")
+	// sunday
+	ed1, _ := time.Parse(time.RFC3339, "2018-05-03T15:02:20+00:00")
+
+	isAvail1 := simplecalendar.DefaultBusinessWeek.IsAvailable(simplecalendar.EventTimes{
+		Start: st1,
+		End: ed1,
+	})
+	if isAvail1 == simplecalendar.Available {
+		log.Println("Is available!")
+	} else {
+		log.Println("Is NOT available!")
+	}
+}
+
+func main() {
+	testTime()
+	testDate()
+
+
 	os.Exit(0)
 
+	simplecalendar.CalendarInit()
+	// Event spans from monday - tuesday
 	st, err := time.Parse(time.RFC3339, "2018-05-21T12:00:00-04:00")
 	if err != nil {
 		log.Fatalf("Unable to init: %v", err)

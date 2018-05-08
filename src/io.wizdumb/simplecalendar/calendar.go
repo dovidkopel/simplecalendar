@@ -14,7 +14,7 @@ var srv *calendar.Service
 var calendarId string
 var cals []string
 
-func init() {
+func CalendarInit() {
 	log.Printf("Initializing calendar service")
 	s, err := getService()
 
