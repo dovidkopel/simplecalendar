@@ -1,20 +1,19 @@
 package simplecalendar
 
-
 import (
 	"log"
 	"time"
 
-	googleapi "google.golang.org/api/googleapi"
-	"google.golang.org/api/calendar/v3"
 	"fmt"
+	"google.golang.org/api/calendar/v3"
+	googleapi "google.golang.org/api/googleapi"
 )
 
 var srv *calendar.Service
 var calendarId string
 var cals []string
 
-func CalendarInit() {
+func CalendarInit() *calendar.Service {
 	log.Printf("Initializing calendar service")
 	s, err := getService()
 
@@ -32,18 +31,31 @@ func CalendarInit() {
 		}
 		log.Printf("There are %d calendars", len(cals))
 	}
+
+	return srv
+}
+
+func GetCalendar() *calendar.Service {
+	return srv
 }
 
 type EventTimes struct {
 	Start time.Time
-	End time.Time
-	Zone time.Location
+	End   time.Time
+	Zone  time.Location
+}
+
+func times(t time.Time, d time.Duration) EventTimes {
+	return EventTimes{
+		Start: t,
+		End:   t.Add(d),
+	}
 }
 
 type Event struct {
-	Label string
-	Times EventTimes
-	Location string
+	Label     string
+	Times     EventTimes
+	Location  string
 	Attendees []string
 }
 
@@ -72,10 +84,10 @@ func sendNotifications() googleapi.CallOption {
 
 /**
 Insert a an event created into the user's Google Calendar
- */
+*/
 func (e *Event) Insert() *calendar.Event {
 	ex := &calendar.Event{
-		Summary: e.Label,
+		Summary:  e.Label,
 		Location: e.Location,
 		Start: &calendar.EventDateTime{
 			DateTime: e.Times.Start.Format(time.RFC3339),
@@ -117,17 +129,17 @@ func GetCalendars() ([]string, error) {
 }
 
 func CreateEventTime(start time.Time, duration time.Duration) EventTimes {
-	return EventTimes {
+	return EventTimes{
 		Start: start,
-		End: start.Add(duration),
+		End:   start.Add(duration),
 	}
 }
 
 func CreateEvent(label string, times EventTimes, location string, attendees []string) Event {
 	return Event{
-		Label: label,
-		Times: times,
-		Location: location,
+		Label:     label,
+		Times:     times,
+		Location:  location,
 		Attendees: attendees,
 	}
 }

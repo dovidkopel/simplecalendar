@@ -8,20 +8,20 @@ type DaySchedule struct {
 	SchedulingPolicy
 	EnabledSetterGetter
 
-	day time.Weekday
+	day     time.Weekday
 	enabled bool
 }
 
 func EnabledDaySchedule(day time.Weekday) *DaySchedule {
 	return &DaySchedule{
-		day: day,
+		day:     day,
 		enabled: true,
 	}
 }
 
 func DisabledDaySchedule(day time.Weekday) *DaySchedule {
 	return &DaySchedule{
-		day: day,
+		day:     day,
 		enabled: false,
 	}
 }

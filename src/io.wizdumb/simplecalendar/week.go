@@ -72,13 +72,13 @@ func (week *WeekSchedule) IsAvailable(times EventTimes) Availability {
 }
 
 var DefaultBusinessWeek = WeekSchedule{
-	days: map[time.Weekday]*DaySchedule {
-		time.Sunday: DisabledDaySchedule(time.Sunday),
-		time.Monday: EnabledDaySchedule(time.Monday),
-		time.Tuesday: EnabledDaySchedule(time.Tuesday),
+	days: map[time.Weekday]*DaySchedule{
+		time.Sunday:    DisabledDaySchedule(time.Sunday),
+		time.Monday:    EnabledDaySchedule(time.Monday),
+		time.Tuesday:   EnabledDaySchedule(time.Tuesday),
 		time.Wednesday: EnabledDaySchedule(time.Wednesday),
-		time.Thursday: EnabledDaySchedule(time.Thursday),
-		time.Friday: EnabledDaySchedule(time.Friday),
-		time.Saturday: EnabledDaySchedule(time.Saturday),
+		time.Thursday:  EnabledDaySchedule(time.Thursday),
+		time.Friday:    EnabledDaySchedule(time.Friday),
+		time.Saturday:  EnabledDaySchedule(time.Saturday),
 	},
 }

@@ -1,8 +1,8 @@
 package simplecalendar
 
 import (
-	"time"
 	"log"
+	"time"
 )
 
 // Time spans that are disabled across days
@@ -28,28 +28,37 @@ type TimeBlockSchedule struct {
 	SchedulingPolicy
 	ContainsTime
 
-	days []time.Weekday
-	start int
-	end int
+	label  string
+	days   []time.Weekday
+	start  int
+	end    int
 	status Availability
 }
 
-func TimeBlockAllDays(start int, end int, status Availability) TimeBlockSchedule {
-	return TimeBlockSchedule{
-		days: []time.Weekday{time.Sunday, time.Monday, time.Tuesday, time.Wednesday, time.Thursday, time.Friday, time.Saturday},
-		start: start,
-		end: end,
+var AllDays = []time.Weekday{time.Sunday, time.Monday, time.Tuesday, time.Wednesday, time.Thursday, time.Friday, time.Saturday}
+
+func TimeBlockAllDays(label string, start int, end int, status Availability) TimeBlockSchedule {
+	t := TimeBlockSchedule{
+		label:  label,
+		days:   AllDays,
+		start:  start,
+		end:    end,
 		status: status,
 	}
+
+	return t
 }
 
-func TimeBlockDays(start int, end int, days []time.Weekday, status Availability) TimeBlockSchedule {
-	return TimeBlockSchedule{
-		days: days,
-		start: start,
-		end: end,
+func TimeBlockDays(label string, start int, end int, days []time.Weekday, status Availability) TimeBlockSchedule {
+	t := TimeBlockSchedule{
+		label:  label,
+		days:   days,
+		start:  start,
+		end:    end,
 		status: status,
 	}
+
+	return t
 }
 
 type TimeSchedule struct {
@@ -58,18 +67,34 @@ type TimeSchedule struct {
 	Times []TimeBlockSchedule
 }
 
+func (b *TimeSchedule) IsAvailable(times EventTimes) Availability {
+	var as []Availability
+	for _, s := range b.Times {
+		as = append(as, s.IsAvailable(times))
+	}
+	return simplify(as)
+}
+
 func (b *TimeBlockSchedule) IsAvailable(times EventTimes) Availability {
-	log.Printf("Start %d %d, End %d %d", times.Start.Hour(), times.Start.Minute(), times.End.Hour(), times.End.Minute())
+	log.Printf("Inputted: Start %d %d, End %d %d", times.Start.Hour(), times.Start.Minute(), times.End.Hour(), times.End.Minute())
 	s := (times.Start.Hour() * 100) + times.Start.Minute()
 	e := (times.End.Hour() * 100) + times.End.Minute()
 
-	log.Printf("Start: %d compared to %d", s, b.start)
-	log.Printf("End: %d compared to %d", e, b.end)
-
+	log.Printf("Start: %d >= to %d", s, b.start)
+	log.Printf("End: %d <= to %d", e, b.end)
 
 	if s >= b.start && e <= b.end {
-		log.Println("BUSY")
-		return Busy
+		log.Println("Return: " + b.status.name)
+		return b.status
 	}
+
+	log.Printf("Start: %d >= to %d", e, b.start)
+	log.Printf("End: %d <= to %d", s, b.end)
+	if e >= b.start && s <= b.end {
+		log.Println("Return: " + b.status.name)
+		return b.status
+	}
+
+	log.Println("Return: " + Unknown.name)
 	return Unknown
 }

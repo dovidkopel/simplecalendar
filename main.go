@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
+	"context"
 	"io.wizdumb/simplecalendar"
-	"os"
 )
 
 /**
@@ -23,28 +23,10 @@ Display the event types that are available
 - Given a selected EventType display the next available time slots
 - If a date is specified begin the time slots at the date specified
 - Else, find earliest time
- */
+*/
 
 func testTime() {
-	sr1 := simplecalendar.TimeBlockAllDays(1300, 1330, simplecalendar.Busy)
-	sr2 := simplecalendar.TimeBlockAllDays(0, 600, simplecalendar.Busy)
 
-	s := simplecalendar.TimeSchedule{
-		Times: []simplecalendar.TimeBlockSchedule{
-			sr1,
-			sr2,
-		},
-	}
-	simplecalendar.Conf.SetTimes(s)
-	st22, _ := time.Parse(time.RFC3339, "2018-05-05T13:02:20+00:00")
-	et22, _ := time.Parse(time.RFC3339, "2018-05-05T13:15:20+00:00")
-	ee := simplecalendar.EventTimes {
-		Start: st22,
-		End: et22,
-	}
-
-	log.Println("Lunch is "+sr1.IsAvailable(ee).String())
-	log.Println("Lunch is "+sr2.IsAvailable(ee).String())
 }
 
 func testDate() {
@@ -55,7 +37,7 @@ func testDate() {
 
 	isAvail := simplecalendar.DefaultBusinessWeek.IsAvailable(simplecalendar.EventTimes{
 		Start: st,
-		End: ed,
+		End:   ed,
 	})
 	if isAvail == simplecalendar.Available {
 		log.Println("Is available!")
@@ -70,7 +52,7 @@ func testDate() {
 
 	isAvail1 := simplecalendar.DefaultBusinessWeek.IsAvailable(simplecalendar.EventTimes{
 		Start: st1,
-		End: ed1,
+		End:   ed1,
 	})
 	if isAvail1 == simplecalendar.Available {
 		log.Println("Is available!")
@@ -79,13 +61,7 @@ func testDate() {
 	}
 }
 
-func main() {
-	testTime()
-	testDate()
-
-
-	os.Exit(0)
-
+func testEventInsert() {
 	simplecalendar.CalendarInit()
 	// Event spans from monday - tuesday
 	st, err := time.Parse(time.RFC3339, "2018-05-21T12:00:00-04:00")
@@ -101,32 +77,54 @@ func main() {
 		"my test",
 		et,
 		"6605 Deancroft Road Baltimore, MD 21209",
-		[]string {"dovid+test1@dovidkopel.com", "dovid+test2@dovidkopel.com", "dovid+test3@dovidkopel.com" },
+		[]string{"dovid+test1@dovidkopel.com", "dovid+test2@dovidkopel.com", "dovid+test3@dovidkopel.com"},
 	)
 	oe := event.Insert()
 	log.Printf("Event created: %s\n", oe.HtmlLink)
-
-	//t := time.Now().Format(time.RFC3339)
-	//events, err := srv.Events.List("primary").ShowDeleted(false).
-	//	SingleEvents(true).TimeMin(t).MaxResults(10).OrderBy("startTime").Do()
-	//if err != nil {
-	//	log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
-	//}
-	//fmt.Println("Upcoming events:")
-	//if len(events.Items) == 0 {
-	//	fmt.Println("No upcoming events found.")
-	//} else {
-	//	for _, item := range events.Items {
-	//		date := item.Start.DateTime
-	//		if date == "" {
-	//			date = item.Start.Date
-	//		}
-	//
-	//		endDate := item.End.DateTime
-	//
-	//		fmt.Printf("%v (%v -> %v)\n", item.Summary, date, endDate)
-	//	}
-	//}
 }
 
-// [END calendar_quickstart]
+func testGetEvents() {
+	t := time.Now().Format(time.RFC3339)
+	events, err := simplecalendar.GetCalendar().Events.List("primary").ShowDeleted(false).
+		SingleEvents(true).TimeMin(t).MaxResults(10).OrderBy("startTime").Do()
+	if err != nil {
+		log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
+	}
+	fmt.Println("Upcoming events:")
+	if len(events.Items) == 0 {
+		fmt.Println("No upcoming events found.")
+	} else {
+		for _, item := range events.Items {
+			date := item.Start.DateTime
+			if date == "" {
+				date = item.Start.Date
+			}
+
+			endDate := item.End.DateTime
+
+			fmt.Printf("%v (%v -> %v)\n", item.Summary, date, endDate)
+		}
+	}
+}
+
+type MyEvent struct {
+	Name string `json:"name"`
+}
+
+func test() {
+	testTime()
+	testDate()
+	//testEventInsert()
+	//testGetEvents()
+}
+
+func HandleRequest(ctx context.Context, name MyEvent) (string, error) {
+	test()
+
+	return fmt.Sprintf("Hello %s!", name.Name), nil
+}
+
+func main() {
+	test()
+	//lambda.Start(HandleRequest)
+}

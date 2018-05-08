@@ -10,10 +10,11 @@ Repeatable schedules
 */
 
 // Is available?
-type Availability struct{
+type Availability struct {
 	string
 	name string
 }
+
 var Available = Availability{
 	name: "available",
 }
@@ -49,9 +50,9 @@ func isAvailable(as []Availability) bool {
 }
 
 type DefaultApproach Availability
+
 var DefaultBusy = DefaultApproach(Busy)
 var DefaultAvailable = DefaultApproach(Available)
-
 
 type DefaultApproachSetter interface {
 	SetDefaultIsAvailable()
@@ -84,8 +85,8 @@ func (c *GeneralSchedulingApproachConfig) SetDefaultIsBusy() {
 
 type SchedulingConf struct {
 	general GeneralSchedulingApproachConfig
-	week WeekSchedule
-	times TimeSchedule
+	week    WeekSchedule
+	times   TimeSchedule
 }
 
 func (s *SchedulingConf) SetTimes(t TimeSchedule) {
