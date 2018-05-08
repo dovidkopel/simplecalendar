@@ -1,21 +1,3 @@
-/**
- * @license
- * Copyright Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-// [START calendar_quickstart]
 package main
 
 import (
@@ -24,9 +6,37 @@ import (
 	"time"
 
 	"io.wizdumb/simplecalendar"
+	"os"
 )
 
+/**
+Based on configuration enable remote user to select
+events and they will be added to the user's calendar
+
+--Event Types--
+Display the event types that are available
+
+--Free/Busy--
+- What is the general daily schedule?
+
+--Schedule Event--
+- Given a selected EventType display the next available time slots
+- If a date is specified begin the time slots at the date specified
+- Else, find earliest time
+ */
+
 func main() {
+	// Event spans from monday - tuesday
+	st, _ := time.Parse(time.RFC3339, "2018-05-05T15:02:20+00:00")
+	ed, _ := time.Parse(time.RFC3339, "2018-06-05T15:02:20+00:00")
+
+	isAvail := simplecalendar.DefaultBusinessWeek.IsAvailable(EventTimes{
+		Start: st,
+		End: ed,
+	})
+	log.Printf("Is available: %b\n", isAvail)
+	os.Exit(0)
+
 	st, err := time.Parse(time.RFC3339, "2018-05-21T12:00:00-04:00")
 	if err != nil {
 		log.Fatalf("Unable to init: %v", err)
@@ -44,31 +54,6 @@ func main() {
 	)
 	oe := event.Insert()
 	log.Printf("Event created: %s\n", oe.HtmlLink)
-
-	//
-	//
-	//// Insert
-	//event := &calendar.Event{
-	//	Summary:     "Google I/O 2020",
-	//	Location:    "800 Howard St., San Francisco, CA 94103",
-	//	Description: "A chance to hear more about Google's developer products.",
-	//	Start: &calendar.EventDateTime{
-	//		DateTime: "2018-05-28T09:00:00-07:00",
-	//		TimeZone: "America/Los_Angeles",
-	//	},
-	//	End: &calendar.EventDateTime{
-	//		DateTime: "2018-05-28T17:00:00-07:00",
-	//		TimeZone: "America/Los_Angeles",
-	//	},
-	//	Attendees: []*calendar.EventAttendee{},
-	//}
-	//
-	//calendarId := "dovidkopel@gmail.com"
-	//event, err = srv.Events.Insert(calendarId, event).Do()
-	//if err != nil {
-	//	log.Fatalf("Unable to create event. %v\n", err)
-	//}
-	//fmt.Printf("Event created: %s\n", event.HtmlLink)
 
 	//t := time.Now().Format(time.RFC3339)
 	//events, err := srv.Events.List("primary").ShowDeleted(false).

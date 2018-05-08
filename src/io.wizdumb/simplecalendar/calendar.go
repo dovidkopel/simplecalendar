@@ -29,12 +29,9 @@ func init() {
 	} else {
 		for _, v := range ids {
 			cals = append(cals, v)
-			//log.Printf("Calendar ID: %v\n", v)
 		}
 		log.Printf("There are %d calendars", len(cals))
 	}
-
-	calendarId = "dovidkopel@gmail.com"
 }
 
 type EventTimes struct {
@@ -73,6 +70,9 @@ func sendNotifications() googleapi.CallOption {
 	return SendNotificationsOption{}
 }
 
+/**
+Insert a an event created into the user's Google Calendar
+ */
 func (e *Event) Insert() *calendar.Event {
 	ex := &calendar.Event{
 		Summary: e.Label,
