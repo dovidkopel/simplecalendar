@@ -1,4 +1,4 @@
---Simple Calendar--
+# Simple Calendar
 
 An attempt to make a standalone tool that enables third parties to schedule appointments with you by using a URL.
 There are many of these services available and most of those with free options. 
