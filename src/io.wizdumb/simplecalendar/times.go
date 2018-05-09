@@ -7,11 +7,15 @@ import (
 
 // Time spans that are disabled across days
 // Busy 1PM - 1:30PM (All)
-// Available: 8:30AM - 7PM (Mon, Wed, Thurs) -->
-//    0000-0829 [Sunday, Tuesday, Wednesday] BUSY
+// Available: 7:00AM - 7PM (Mon, Wed, Thurs) -->
+//    0000-0829 [Monday, Wednesday, Thursday] BUSY
 //    0701-2359 [Monday, Wednesday, Thursday] BUSY
-// Available: 6AM - 5PM (Friday)
-// Available: 10AM - 10PM (Tuesday)
+// Available: 6AM - 4PM (Friday) - Early day -->
+//    0000-0559 [Friday] BUSY - Pre
+//    1601-2359 [Friday] BUSY - Post
+// Available: 12PM - 10PM (Tuesday) - Late day
+//    0000-1159 [Tuesday] BUSY - Pre
+//    2201-2359 [Tuesday] BUSY - Post
 
 // A time that is not bound to a day
 // The only question to ask is whether a
@@ -70,7 +74,11 @@ type TimeSchedule struct {
 func (b *TimeSchedule) IsAvailable(times EventTimes) Availability {
 	var as []Availability
 	for _, s := range b.Times {
-		as = append(as, s.IsAvailable(times))
+		for _, d := range s.days {
+			if times.Start.Weekday() == d || times.End.Weekday() == d {
+				as = append(as, s.IsAvailable(times))
+			}
+		}
 	}
 	return simplify(as)
 }
