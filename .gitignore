@@ -2,3 +2,5 @@ client_secret.json
 token.json
 .idea/
 *.iml
+pkg/
+src/io.wizdumb/simplecalendar/vendor/
