@@ -39,26 +39,6 @@ func GetCalendar() *calendar.Service {
 	return srv
 }
 
-type EventTimes struct {
-	Start time.Time
-	End   time.Time
-	Zone  time.Location
-}
-
-func times(t time.Time, d time.Duration) EventTimes {
-	return EventTimes{
-		Start: t,
-		End:   t.Add(d),
-	}
-}
-
-type Event struct {
-	Label     string
-	Times     EventTimes
-	Location  string
-	Attendees []string
-}
-
 func convertAttendees(attendees []string) []*calendar.EventAttendee {
 	var as []*calendar.EventAttendee
 	for _, v := range attendees {
@@ -126,6 +106,40 @@ func GetCalendars() ([]string, error) {
 	}
 
 	return l, err
+}
+
+func GetEvents(min time.Time, max time.Time) []Event {
+	events, err := GetCalendar().Events.List("primary").
+		ShowDeleted(false).
+		SingleEvents(true).
+		TimeMin(min.Format(time.RFC3339)).
+		TimeMax(max.Format(time.RFC3339)).
+		OrderBy("startTime").Do()
+	if err != nil {
+		log.Fatalf("Unable to retrieve next ten of the user's events: %v", err)
+	}
+	fmt.Println("Upcoming events:")
+	if len(events.Items) == 0 {
+		fmt.Println("No upcoming events found.")
+		return []Event{}
+	} else {
+		var as []Event
+		for _, item := range events.Items {
+			if len(item.Start.DateTime) > 0 && len(item.End.DateTime) > 0 {
+				date, _ := time.Parse(time.RFC3339, item.Start.DateTime)
+				endDate, _ := time.Parse(time.RFC3339, item.End.DateTime)
+				ts := EventTimes{
+					Start: date,
+					End: endDate,
+				}
+				as = append(as, Event{
+					Label: item.Summary,
+					Times: ts,
+				})
+			}
+		}
+		return as
+	}
 }
 
 func CreateEventTime(start time.Time, duration time.Duration) EventTimes {

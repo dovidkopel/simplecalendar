@@ -3,4 +3,6 @@ token.json
 .idea/
 *.iml
 pkg/
+docker-build.sh
 src/io.wizdumb/simplecalendar/vendor/
+bin/

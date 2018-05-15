@@ -1,5 +1,7 @@
 package simplecalendar
 
+import "time"
+
 /**
 Repeatable schedules
 1. What is the default, should times be marked as "busy" or "available"
@@ -69,6 +71,32 @@ type SchedulingPolicy interface {
 	IsAvailable(times EventTimes) Availability
 }
 
+type AvailabilityIterator interface {
+	Next() EventTimes
+}
+
+type AvailabilityQuery struct {
+	AvailabilityIterator
+
+	min time.Time
+	dur time.Duration
+
+	max time.Time
+}
+
+func createIterator(min time.Time, dur time.Duration) AvailabilityQuery {
+	return AvailabilityQuery{min: min, dur: dur, max: min.AddDate(0, 0, 7)}
+}
+
+func (q *AvailabilityQuery) Next() EventTimes {
+	// Get any events within that time
+	es := GetEvents(q.min, q.max)
+	if len(es) > 0 {
+
+	}
+	return EventTimes{}
+}
+
 type GeneralSchedulingApproachConfig struct {
 	DefaultApproachSetter
 
@@ -89,6 +117,10 @@ type SchedulingConf struct {
 	times   TimeSchedule
 }
 
+func (s *SchedulingConf) SetWeek(w WeekSchedule) {
+	s.week = w
+}
+
 func (s *SchedulingConf) SetTimes(t TimeSchedule) {
 	s.times = t
 }
@@ -98,4 +130,17 @@ var Conf = SchedulingConf{
 		approach: DefaultAvailable,
 	},
 	week: DefaultBusinessWeek,
+}
+
+// Func to approve
+
+// First the week
+// Then times
+
+func FindTimes(tpe EventType) []EventTimes {
+	// Find how many slots in the next 7 days
+	// Only let meetings be scheduled at 15 minute intervals
+	// On a given calendar day first determine what are all of the valid
+	// slots
+
 }

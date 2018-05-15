@@ -65,13 +65,6 @@ type PartScenario struct {
 	expect Availability
 }
 
-// 2018-05-06 = Sunday 0
-// 2018-05-07 = Monday 1
-// 2018-05-08 = Tuesday 2
-// 2018-05-09 = Wednesday 3
-// 2018-05-10 = Thursday 4
-// 2018-05-11 = Friday 5
-// 2018-05-12 = Saturday 6
 var weekdays = map[time.Weekday]int {
 	time.Sunday: 0,
 	time.Monday: 1,
@@ -172,7 +165,6 @@ func TestTimes(t *testing.T) {
 	s := prep()
 	Conf.SetTimes(s)
 
-	//ss := scenarios()
 	ss := append(monWedThurScenarios(), fridayScenarios()...)
 	ss = append(ss, tuesdayScenarios()...)
 

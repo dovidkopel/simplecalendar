@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion : '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Description: An example API written in Golang
+Resources:
+  ExampleAPI:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Runtime: go1.x
+      Handler: bin/main
+      Events:
+        RootHandler:
+          Type: Api
+          Properties:
+            Path: '/'
+            Method: get
+        SlotHandler:
+          Type: Api
+          Properties:
+            Path: '/slots/{eventType}'
+            Method: get
+        GoodbyeHandler:
+          Type: Api
+          Properties:
+            Path: '/goodbye'
+            Method: get

@@ -1,0 +1,13 @@
+version: "3"
+services:
+  local-start-api:
+    working_dir: /var/task
+    command: sam local start-api --host 0.0.0.0 -v /var/task -t /var/task/template.yml
+    privileged: true
+    image: dovidkopel/aws-sam-local:0.3.0
+    volumes:
+      - $PWD:/var/task
+      - /var/lib/docker:/var/lib/docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "3000:3000"
